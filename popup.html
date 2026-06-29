@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"> 
+    <title>Aylıq Plan Hesablayıcı</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Honk&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="popup.css"> 
+    <link rel="stylesheet" href="target.css"> 
+</head>
+<body>
+    
+    <div class="header-logo">HemidEziz</div>
+
+    <div class="lang-switcher">
+        <button class="lang-button" id="lang-az" data-lang="az">AZ</button>
+        <button class="lang-button" id="lang-en" data-lang="en">EN</button>
+        <button class="lang-button" id="lang-ru" data-lang="ru">RU</button>
+        <button class="lang-button" id="lang-tr" data-lang="tr">TR</button>
+    </div>
+
+    <div class="tab-menu">
+        <button class="tab-link active" data-target="plan" id="tab_plan">Plan</button>
+        <button class="tab-link" data-target="workhours" id="tab_workhours">İş Saatı</button>
+        <button class="tab-link" data-target="crm" id="tab_crm">CRM Xəta</button>
+    </div>
+    
+    <div id="main-content"></div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

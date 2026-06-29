@@ -1,0 +1,53 @@
+/* target.css - YEKUN DÜZƏLİŞLƏR: Tünd Temaya Uyğun Cədvəl Stilləri */
+
+:root {
+    --text-color: #ffffff;
+    --primary-color: #00eaff;
+    --secondary-bg: rgba(255, 255, 255, 0.1);
+    --border-color: rgba(0, 234, 255, 0.3);
+}
+
+/* Hədəf Səhifəsi Məlumat qutusu stilləri */
+.target-info {
+    padding: 10px;
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+.target-info strong { 
+    display: inline-block; 
+    width: 150px; 
+    font-weight: bold; 
+    color: var(--text-color); 
+}
+
+/* Günlük Bonus Hədəfləri Cədvəlinin Stilləri */
+#daily_bonus_targets {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 1.0em;
+}
+#daily_bonus_targets th, #daily_bonus_targets td {
+    border: 1px solid var(--border-color); 
+    padding: 10px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5); /* Cədvəl hücrələri üçün tünd fon */
+    color: var(--text-color); 
+}
+#daily_bonus_targets th {
+    background-color: var(--secondary-bg); 
+    color: var(--primary-color); 
+    text-shadow: 0 0 5px var(--primary-color);
+}
+/* Xüsusi Rəngləndirmə Stilləri */
+.daily-plan-value {
+    color: #00ff00; 
+    font-weight: bold;
+    text-shadow: 0 0 3px #00ff00;
+}
+.earned-eur {
+    color: #ff6b6b; 
+    font-weight: bold;
+    text-shadow: 0 0 3px #ff0000;
+}

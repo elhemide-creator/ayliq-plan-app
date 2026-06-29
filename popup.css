@@ -1,0 +1,447 @@
+/* popup.css - YIĞCAMLAŞDIRILMIŞ VERSİYA VƏ TƏQVİM BƏRPASI */
+
+:root {
+    /* Tünd Tema Dəyişənləri */
+    --main-bg: #121212; 
+    --text-color: #e0e0e0; 
+    --primary-color: #00eaff; 
+    --secondary-bg: rgba(255, 255, 255, 0.08); 
+    --border-color: rgba(0, 234, 255, 0.5); 
+    --neon-shadow: 0 0 8px var(--primary-color); 
+    --danger-color: #ff6b6b; 
+}
+
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    font-size: 14px; 
+    /* Yığcam en saxlanılır */
+    min-width: 400px; 
+    /* Yığcam padding saxlanılır */
+    padding: 10px; 
+    background-color: var(--main-bg);
+    color: var(--text-color);
+    /* Yığcam padding-bottom saxlanılır */
+    padding-bottom: 60px; 
+}
+
+/* === LOQO STİLİ === */
+.header-logo {
+    font-family: 'Honk', system-ui, sans-serif; 
+    font-size: 2.2em; 
+    font-weight: 400; 
+    text-align: center;
+    margin-top: 5px; 
+    margin-bottom: 20px; 
+    letter-spacing: 2px;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings:
+        "MORF" 15, 
+        "SHLN" 50;
+    color: #ff80ff; 
+    text-shadow: 
+        0 0 8px #ff69b4,     
+        0 0 16px #ffc300,    
+        0 0 25px #ff80ff,    
+        0 0 35px rgba(255, 255, 255, 0.7); 
+    user-select: none; 
+    animation: none; 
+    box-shadow: none; 
+}
+
+/* === GİRİŞ XANALARI DÜZƏLİŞİ (Spin düymələri ləğv edilir) === */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield; /* Firefox üçün */
+}
+
+
+/* === SİMMETRİYA VƏ HİZALANMA DÜZƏLİŞLƏRİ === */
+
+/* Bütün əsas qruplar üçün */
+.input-group, .total, .percentage, .final-result, .daily-target-container, .target-info .result-item {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hər bir etiket və dəyər sətri */
+.input-row {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    margin-bottom: 8px; 
+    padding: 0 5px; 
+}
+
+label { 
+    display: block; 
+    font-weight: 600; 
+    color: var(--text-color); 
+    flex-grow: 1; 
+}
+
+input[type="number"] { 
+    width: 100px; 
+    padding: 5px; 
+    border: 1px solid var(--border-color); 
+    background-color: var(--secondary-bg);
+    color: var(--text-color);
+    border-radius: 4px; 
+    transition: all 0.3s;
+    text-align: right; 
+    flex-shrink: 0; 
+}
+input[type="number"]:focus {
+    box-shadow: var(--neon-shadow);
+    border-color: var(--primary-color);
+}
+
+.header { 
+    background-color: var(--secondary-bg); 
+    padding: 5px; 
+    font-size: 1.1em; 
+    border-radius: 8px; 
+    border: 1px solid var(--border-color);
+    color: var(--text-color); 
+    margin-bottom: 12px; 
+}
+
+/* Nəticə blokları */
+.total, .percentage, .final-result { 
+    margin-top: 5px; 
+    padding: 8px 5px; 
+    border-top: 1px solid var(--border-color); 
+    font-weight: bold; 
+    background-color: rgba(255, 255, 255, 0.12); 
+    border-radius: 4px;
+    color: var(--text-color); 
+}
+
+/* Nəticə dəyərlərinin hizalanması */
+.total .input-row, .percentage .input-row, .final-result .input-row {
+    padding: 0; 
+    margin-bottom: 5px;
+}
+.percentage > label {
+    margin-bottom: 5px;
+    font-size: 1.05em; 
+}
+
+
+/* Nəticə dəyərləri (məbləğ və faizlər) */
+#total_value, #percentage_reached, #percentage_left, #final_result_value_eur, #final_result_value_azn {
+    text-align: right;
+    font-size: 1.0em; 
+    flex-shrink: 0;
+    max-width: 50%;
+}
+#total_value { font-size: 1.1em; } 
+#final_result_value_eur, #final_result_value_azn {
+    font-size: 1.1em; 
+    color: var(--danger-color);
+    text-shadow: 0 0 3px #ff0000;
+    display: block; 
+    margin-top: 5px;
+}
+#percentage_reached { color: #50fa7b; } 
+
+
+/* === YAPIŞDIRILMIŞ DÜYMƏ ÜÇÜN DÜZƏLİŞ === */
+#back-button-container {
+    position: fixed; 
+    bottom: 0; 
+    left: 0;
+    right: 0; 
+    width: auto; 
+    padding: 10px 10px; 
+    box-sizing: border-box;
+    background-color: var(--main-bg); 
+    border-top: 1px solid rgba(255, 255, 255, 0.1); 
+    z-index: 10;
+}
+#back-button-container #back_button {
+    margin-top: 0;
+}
+
+
+/* === DÜYMƏ STİLLƏRİ === */
+#target_button, #back_button, .lang-button {
+    transition: all 0.3s ease-in-out;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: black; 
+}
+#target_button, #back_button {
+    width: 100%;
+    padding: 10px; 
+    margin-top: 10px; 
+    border: none;
+    font-size: 1.0em; 
+}
+
+/* Target Button */
+#target_button {
+    background-color: var(--primary-color);
+    color: black; 
+    border: 2px solid transparent;
+}
+#target_button:hover {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    box-shadow: var(--neon-shadow);
+}
+
+/* Back Button */
+#back_button {
+    background-color: #6c757d;
+    color: white; 
+}
+#back_button:hover {
+    background-color: #5a6268;
+    box-shadow: 0 0 8px #fff;
+}
+
+/* Dil Düymələri */
+.lang-switcher {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px; 
+    padding-bottom: 8px; 
+    border-bottom: 1px dashed var(--border-color); 
+    gap: 5px;
+}
+.lang-button {
+    padding: 4px 7px; 
+    border: 1px solid var(--border-color);
+    background-color: var(--secondary-bg);
+    font-size: 0.8em;
+    opacity: 0.7;
+    color: var(--text-color); 
+}
+.lang-button.active {
+    opacity: 1;
+    background-color: var(--primary-color);
+    color: black; 
+    border-color: var(--primary-color);
+    box-shadow: var(--neon-shadow);
+}
+.lang-button:hover:not(.active) {
+    opacity: 1;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* === AYARLAR / TƏQVİM DÜZƏLİŞLƏRİ VƏ STİLLƏRİ === */
+.settings-on-target {
+    border: 1px solid var(--border-color);
+    padding: 8px; 
+    margin-bottom: 10px; 
+    border-radius: 8px;
+    background-color: var(--secondary-bg);
+}
+
+/* Açılıb-Bağlanan Düymə */
+#settings-toggle-button {
+    width: 100%; 
+    text-align: left;
+    background: none;
+    border: 1px solid transparent; 
+    border-radius: 4px;
+    color: var(--primary-color);
+    text-shadow: 0 0 2px var(--primary-color);
+    transition: all 0.2s;
+    cursor: pointer;
+    padding: 3px 8px; 
+    font-weight: bold;
+}
+
+/* Açılıb-Bağlanan Məzmun */
+#settings-content-container {
+    max-height: 500px; 
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    opacity: 1;
+    padding-top: 10px;
+}
+#settings-content-container.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+}
+
+
+/* TƏQVİM STİLLƏRİ (Əsas Düzəlişlər burada edildi) */
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    border-radius: 5px;
+    padding: 5px;
+}
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 2px;
+    /* DÜZƏLİŞ: Ölçü bərpa edildi */
+    font-size: 10px; 
+    color: rgba(255, 255, 255, 0.7); 
+}
+#calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    /* Düzgün hizalanma üçün aralıq ləğv edildi */
+    gap: 0; 
+    padding: 2px 0; /* Üst/alt padding əlavə edildi */
+}
+.calendar-day {
+    padding: 2px 0;
+    text-align: center;
+    cursor: pointer;
+    /* DÜZƏLİŞ: Ölçü bərpa edildi */
+    font-size: 10px; 
+    border-radius: 0; /* Kəskin künclər üçün ləğv edildi */
+    transition: background-color 0.1s;
+    background-color: rgba(0, 0, 0, 0.3) !important; 
+    color: var(--text-color) !important;
+    /* DÜZƏLİŞ: Hündürlük dəqiq təyin edildi */
+    height: 18px; 
+    line-height: 18px; 
+    border: 1px solid transparent; /* Sərhədlərin qarışmaması üçün */
+}
+.calendar-day:nth-child(7n), .calendar-day:nth-child(7n-1) {
+    /* Həftəsonu günlərinin künclərini düzəldirik */
+    border-radius: 0;
+}
+.calendar-day.weekend {
+    background-color: var(--danger-color) !important; 
+    color: white !important; 
+    font-weight: bold;
+    text-shadow: 0 0 1px black;
+}
+.calendar-day.holiday-selected {
+    background-color: var(--primary-color) !important; 
+    color: black !important;
+    font-weight: bold;
+    text-shadow: none;
+    box-shadow: 0 0 5px var(--primary-color);
+    /* Seçilmiş gün üçün küncləri bərpa etdik */
+    border-radius: 3px; 
+}
+.calendar-day.past-day {
+    cursor: default;
+    opacity: 0.3;
+}
+
+
+/* === HƏDƏF SƏHİFƏSİ (TARGET STİLLƏRİ) === */
+.target-info {
+    padding: 8px; 
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.target-info strong { 
+    display: block; 
+    font-weight: bold; 
+    color: var(--text-color); 
+}
+
+/* Günlük Bonus Hədəfləri Cədvəlinin Stilləri */
+#daily_bonus_targets {
+    margin-top: 15px; 
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.9em; 
+    margin-bottom: 60px; 
+}
+#daily_bonus_targets th, #daily_bonus_targets td {
+    border: 1px solid var(--border-color); 
+    padding: 8px; 
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5); 
+    color: var(--text-color); 
+}
+#daily_bonus_targets th {
+    background-color: var(--secondary-bg); 
+    color: var(--primary-color); 
+    text-shadow: 0 0 5px var(--primary-color);
+}
+/* Xüsusi Rəngləndirmə Stilləri */
+.daily-plan-value {
+    color: #00ff00; 
+    font-weight: bold;
+    text-shadow: 0 0 3px #00ff00;
+}
+.earned-eur {
+    color: #ff6b6b; 
+    font-weight: bold;
+    text-shadow: 0 0 3px #ff0000;
+}
+
+/* === TAYMER VƏ ARXİV STİLLƏRİ === */
+.timer-display {
+    font-size: 2.2em;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    margin: 10px 0;
+    color: var(--primary-color);
+    text-shadow: var(--neon-shadow);
+    letter-spacing: 2px;
+}
+#archive_table th, #archive_table td {
+    border: 1px solid var(--border-color);
+    padding: 6px;
+    text-align: left;
+}
+#archive_table th {
+    background: var(--secondary-bg);
+    color: var(--primary-color);
+}
+#archive_table td {
+    color: var(--text-color);
+}
+/* === TAB MENYUSU STİLLƏRİ === */
+.tab-menu {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.tab-link {
+    flex: 1;
+    background: transparent;
+    color: var(--text-color);
+    border: none;
+    padding: 10px 5px;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+}
+
+.tab-link:hover {
+    background-color: rgba(0, 234, 255, 0.1);
+}
+
+.tab-link.active {
+    background-color: var(--primary-color);
+    color: black;
+    box-shadow: var(--neon-shadow);
+}

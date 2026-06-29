@@ -1,0 +1,42 @@
+{
+  "name": "ayliq-plan",
+  "version": "1.0.0",
+  "description": "Aylıq Plan Hesablayıcı",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SENIN_GITHUB_ADIN/SENIN_REPO_ADIN.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder -w",
+    "publish": "electron-builder -w -p always"
+  },
+  "author": "HemidEziz",
+  "license": "ISC",
+  "dependencies": {
+    "electron-updater": "^6.1.7"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.hemideziz.ayliqplan",
+    "productName": "Aylıq Plan",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "elhemide-creator",
+        "repo": "ayliq-plan-app"
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
