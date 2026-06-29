@@ -18,48 +18,54 @@ function createWindow () {
 
   mainWindow.loadFile('popup.html');
 
-  // Pəncərə açılanda yenilənmələri yoxla
   mainWindow.once('ready-to-show', () => {
+    // Proqram açılanda yenilənməni yoxlamağa başlayır
     autoUpdater.checkForUpdatesAndNotify();
   });
 }
 
 app.whenReady().then(() => {
   createWindow();
-
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  if (process.platform !== 'darwin') app.quit();
 });
 
-// --- AVTOMATİK YENİLƏNMƏ EVENTLƏRİ ---
+// --- YENİLƏNMƏ ÜÇÜN TEST (DEBUG) KODLARI ---
 
-// Yeni versiya tapıldıqda
-autoUpdater.on('update-available', () => {
-  console.log('Yeni versiya tapıldı, yüklənir...');
+autoUpdater.on('checking-for-update', () => {
+  // dialog.showMessageBox({ type: 'info', title: 'Test', message: 'Yenilənmə yoxlanılır...' }); 
+  // (Bunu aktiv etmirik ki, hər dəfə proqram açılanda bezdirməsin)
 });
 
-// Yeni versiya yükləndikdə
+autoUpdater.on('update-available', (info) => {
+  dialog.showMessageBox({ type: 'info', title: 'Tapıldı!', message: 'Yeni versiya tapıldı! Arxa planda yüklənir, zəhmət olmasa gözləyin...' });
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  // dialog.showMessageBox({ type: 'info', title: 'Ən son versiya', message: 'Hazırda ən son versiyanı istifadə edirsiniz.' });
+});
+
+autoUpdater.on('error', (err) => {
+  dialog.showErrorBox('Yenilənmə Xətası!', err == null ? "Bilinməyən xəta" : (err.stack || err).toString());
+});
+
 autoUpdater.on('update-downloaded', () => {
   const dialogOpts = {
     type: 'info',
     buttons: ['İndi Yenidən Başlat', 'Sonra'],
     title: 'Tətbiq Yenilənməsi',
-    message: 'Yeni versiya yükləndi!',
+    message: 'Yeni versiya tam yükləndi!',
     detail: 'Dəyişikliklərin tətbiq edilməsi üçün proqram yenidən başladılmalıdır.'
   };
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) {
-      autoUpdater.quitAndInstall(); // Proqramı bağla və yeni versiyanı qur
+      autoUpdater.quitAndInstall();
     }
   });
 });
