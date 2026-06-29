@@ -1,4 +1,4 @@
-// popup.js - ELECTRON 3 SƏHİFƏLİ VERSİYA (Plan, İş Saatı, CRM Xəta - 7.5 saatlıq hesablama ilə)
+// popup.js
 
 const BASE_AMOUNT_EUR = 440;
 const EXCHANGE_RATE = 1.85; 
@@ -10,137 +10,66 @@ const BONUS_PERCENTAGES = {
 };
 
 let currentLang = 'az'; 
-let currentTab = 'plan'; // 'plan', 'workhours', 'crm'
+let currentTab = 'plan'; 
 let isTargetView = false; 
 
-// Plan Dəyişənləri
 let currentHolidays = []; 
 let currentCalcType = 'all'; 
 let isSettingsCollapsed = true; 
 let lastPlan = 0; let lastDoc = 0; let lastCrm = 0;
 
-// Taymer Dəyişənləri
 let timerInterval = null;
 let timerSeconds = 0;
 let archiveData = [];
 let isArchiveVisible = false;
 
-// İş Saatı Dəyişənləri
 let sickDays = 0; let vacDays = 0; let holDays = 0;
 
 const LANGUAGE_DATA = {
     az: {
-        tabPlan: "Plan", tabWorkHours: "İş Saatı", tabCrm: "CRM Xəta",
-        plan: "Aylıq Plan", doc: "DOC", crm: "CRM", total: "Toplam", result: "Nəticə",
-        completed: "% Tamamlanıb", remaining: "% Qalıb", bonusCalc: "Bonus Hesablaması:", 
-        targetBtn: "Hədəfə Nə Qədər Qalıb?", targetTitle: "Hədəfə Nə Qədər Qalıb?", 
-        backBtn: "Əsas Plana Geri Qayıt", remDays: "Qalan Gün Sayı:", totalPlan: "Aylıq Plan:",
-        currentTotal: "Hazırkı Toplam:", neededAmount: "Qalıq Məbləğ:", dailyPlanning: "Günlük Planlama (Mövcud Toplama Görə)",
-        dailyTarget: "Ümumi Gündəlik Hədəf:", bonusTableTitle: "Bonus Cədvəlinə Çatmaq üçün Günlük Plan",
-        targetPercent: "Hədəf Faizi", requiredAmount: "Tələb Olunan Məbləğ", earnedEur: "Qazanc (EUR)", 
-        dailyRequired: "Gündəlik Lazım Olan", reached: "Çatılıb", planNotSet: "Aylıq plan təyin edilməyib.",
-        daysFinished: "Bu ayın bütün günləri bitib.", placeholder: "Ümumi planı yazın",
-        calcTitle: "Hesablama Növü:", calcAllDays: "Bütün Günlər", calcWorkDays: "İş Günləri", 
-        holidaysTitle: "Bayram Günləri (İş Günü Hesablanmayacaq):", remWorkDays: "Qalan İş Günü Sayı:",
-        settingsTitle: "Təqvim və Hesablama Ayarları",
-        whTitle: "İş Saatı Hesablayıcı", 
-        whInfo: "(09:00 - 18:00 / Gündəlik xalis iş: 7.5 saat)", // YENİLƏNDİ
-        sickLeave: "Xəstəlik (Gün)", vacation: "Məzuniyyət (Gün)", holidayLeave: "Bayram (Gün)",
-        totalDays: "Ayın Ümumi Günləri:", weekends: "Şənbə/Bazar Günləri:", 
-        workDays: "Xalis İş Günü:", totalHours: "Yekun İş Saatı:",
-        timerTitle: "Fasilə və Xəta Taymeri", reasonPlaceholder: "Dayanma səbəbini yazın...",
-        startTimerBtn: "Başla", stopTimerBtn: "Dayandır", showArchive: "Arxivi Göstər", hideArchive: "Arxivi Gizlət",
-        dateCol: "Tarix", durationCol: "Müddət", reasonCol: "Səbəb", emptyArchive: "Arxiv boşdur"
+        tabPlan: "Plan", tabWorkHours: "İş Saatı", tabCrm: "CRM Xəta", plan: "Aylıq Plan", doc: "DOC", crm: "CRM", total: "Toplam", result: "Nəticə", completed: "% Tamamlanıb", remaining: "% Qalıb", bonusCalc: "Bonus Hesablaması:", targetBtn: "Hədəfə Nə Qədər Qalıb?", targetTitle: "Hədəfə Nə Qədər Qalıb?", backBtn: "Əsas Plana Geri Qayıt", remDays: "Qalan Gün Sayı:", totalPlan: "Aylıq Plan:", currentTotal: "Hazırkı Toplam:", neededAmount: "Qalıq Məbləğ:", dailyPlanning: "Günlük Planlama", dailyTarget: "Günlük Hədəf:", bonusTableTitle: "Günlük Plan", targetPercent: "Hədəf %", requiredAmount: "Tələb Olunan", earnedEur: "Qazanc (EUR)", dailyRequired: "Gündəlik Lazım Olan", reached: "Çatılıb", planNotSet: "Aylıq plan təyin edilməyib.", daysFinished: "Bu ayın bütün günləri bitib.", placeholder: "Ümumi planı yazın", calcTitle: "Hesablama Növü:", calcAllDays: "Bütün Günlər", calcWorkDays: "İş Günləri", holidaysTitle: "Bayram Günləri:", remWorkDays: "Qalan İş Günü:", settingsTitle: "Ayarlar", whTitle: "İş Saatı Hesablayıcı", whInfo: "(09:00 - 18:00 / Gündəlik xalis iş: 7.5 saat)", sickLeave: "Xəstəlik (Gün)", vacation: "Məzuniyyət (Gün)", holidayLeave: "Bayram (Gün)", totalDays: "Ümumi Gün:", weekends: "Şənbə/Bazar:", workDays: "Xalis İş Günü:", totalHours: "Yekun İş Saatı:", timerTitle: "Fasilə və Xəta Taymeri", reasonPlaceholder: "Dayanma səbəbini yazın...", startTimerBtn: "Başla", stopTimerBtn: "Dayandır", showArchive: "Arxivi Göstər", hideArchive: "Arxivi Gizlət", dateCol: "Tarix", durationCol: "Müddət", reasonCol: "Səbəb", emptyArchive: "Arxiv boşdur"
     },
     en: {
-        tabPlan: "Plan", tabWorkHours: "Work Hours", tabCrm: "CRM Error",
-        plan: "Monthly Plan", doc: "DOC", crm: "CRM", total: "Total", result: "Result", 
-        completed: "% Completed", remaining: "% Remaining", bonusCalc: "Bonus Calculation:", 
-        targetBtn: "How Much is Left to Target?", targetTitle: "How Much is Left to Target?", 
-        backBtn: "Go Back to Main Plan", remDays: "Remaining Days:", totalPlan: "Monthly Plan:",
-        currentTotal: "Current Total:", neededAmount: "Needed Amount:", dailyPlanning: "Daily Planning (Based on Current Total)",
-        dailyTarget: "Overall Daily Target:", bonusTableTitle: "Daily Plan to Reach Bonus Target",
-        targetPercent: "Target Percent", requiredAmount: "Required Amount", earnedEur: "Earnings (EUR)", 
-        dailyRequired: "Daily Needed", reached: "Reached", planNotSet: "Monthly plan not set.",
-        daysFinished: "All days of this month are over.", placeholder: "Enter total plan",
-        calcTitle: "Calculation Type:", calcAllDays: "All Days", calcWorkDays: "Work Days Only", 
-        holidaysTitle: "Holidays (Will Not Be Counted as Work Day):", remWorkDays: "Remaining Work Days:",
-        settingsTitle: "Calendar and Calculation Settings", 
-        whTitle: "Work Hours Calculator", 
-        whInfo: "(09:00 - 18:00 / Net daily work: 7.5 hours)", // YENİLƏNDİ
-        sickLeave: "Sick Leave (Days)", vacation: "Vacation (Days)", holidayLeave: "Holiday (Days)",
-        totalDays: "Total Days in Month:", weekends: "Weekends:", 
-        workDays: "Net Work Days:", totalHours: "Total Work Hours:",
-        timerTitle: "Error & Break Timer", reasonPlaceholder: "Enter pause reason...",
-        startTimerBtn: "Start", stopTimerBtn: "Stop", showArchive: "Show Archive", hideArchive: "Hide Archive",
-        dateCol: "Date", durationCol: "Duration", reasonCol: "Reason", emptyArchive: "Archive is empty"
+        tabPlan: "Plan", tabWorkHours: "Work Hours", tabCrm: "CRM Error", plan: "Monthly Plan", doc: "DOC", crm: "CRM", total: "Total", result: "Result", completed: "% Completed", remaining: "% Remaining", bonusCalc: "Bonus Calculation:", targetBtn: "How Much is Left to Target?", targetTitle: "How Much is Left to Target?", backBtn: "Go Back to Main Plan", remDays: "Remaining Days:", totalPlan: "Monthly Plan:", currentTotal: "Current Total:", neededAmount: "Needed Amount:", dailyPlanning: "Daily Planning", dailyTarget: "Overall Daily Target:", bonusTableTitle: "Daily Plan", targetPercent: "Target %", requiredAmount: "Required Amount", earnedEur: "Earnings (EUR)", dailyRequired: "Daily Needed", reached: "Reached", planNotSet: "Monthly plan not set.", daysFinished: "All days of this month are over.", placeholder: "Enter total plan", calcTitle: "Calculation Type:", calcAllDays: "All Days", calcWorkDays: "Work Days Only", holidaysTitle: "Holidays:", remWorkDays: "Remaining Work Days:", settingsTitle: "Settings", whTitle: "Work Hours Calculator", whInfo: "(09:00 - 18:00 / Net daily work: 7.5 hours)", sickLeave: "Sick Leave (Days)", vacation: "Vacation (Days)", holidayLeave: "Holiday (Days)", totalDays: "Total Days:", weekends: "Weekends:", workDays: "Net Work Days:", totalHours: "Total Work Hours:", timerTitle: "Error & Break Timer", reasonPlaceholder: "Enter pause reason...", startTimerBtn: "Start", stopTimerBtn: "Stop", showArchive: "Show Archive", hideArchive: "Hide Archive", dateCol: "Date", durationCol: "Duration", reasonCol: "Reason", emptyArchive: "Archive is empty"
     },
     ru: { 
-        tabPlan: "План", tabWorkHours: "Часы", tabCrm: "CRM Ошибка", plan: "Месячный план", doc: "ДОК", crm: "CRM", total: "Итог", result: "Результат", completed: "% Выполнено", remaining: "% Осталось", bonusCalc: "Расчет бонуса:", targetBtn: "Сколько осталось до цели?", targetTitle: "Сколько осталось до цели?", backBtn: "Вернуться к основному плану", remDays: "Осталось дней:", totalPlan: "Месячный план:", currentTotal: "Текущий итог:", neededAmount: "Оставшаяся сумма:", dailyPlanning: "Дневное планирование", dailyTarget: "Дневная цель:", bonusTableTitle: "Дневной план", targetPercent: "Процент", requiredAmount: "Требуемая сумма", earnedEur: "Заработок (EUR)", dailyRequired: "Нужно в день", reached: "Достигнуто", planNotSet: "План не установлен.", daysFinished: "Дни прошли.", placeholder: "Введите план", calcTitle: "Тип расчета:", calcAllDays: "Все Дни", calcWorkDays: "Рабочие Дни", holidaysTitle: "Праздники:", remWorkDays: "Осталось Рабочих Дней:", settingsTitle: "Настройки", 
-        whTitle: "Калькулятор Часов", whInfo: "(09:00 - 18:00 / Чистая работа: 7.5 часов)", // YENİLƏNDİ
-        sickLeave: "Больничный (Дни)", vacation: "Отпуск (Дни)", holidayLeave: "Праздник (Дни)", totalDays: "Всего дней в месяце:", weekends: "Выходные (Сб/Вс):", workDays: "Чистые рабочие дни:", totalHours: "Итого часов:", timerTitle: "Таймер ошибок", reasonPlaceholder: "Причина остановки...", startTimerBtn: "Старт", stopTimerBtn: "Стоп", showArchive: "Показать архив", hideArchive: "Скрыть архив", dateCol: "Дата", durationCol: "Длительность", reasonCol: "Причина", emptyArchive: "Архив пуст"
+        tabPlan: "План", tabWorkHours: "Часы", tabCrm: "CRM Ошибка", plan: "Месячный план", doc: "ДОК", crm: "CRM", total: "Итог", result: "Результат", completed: "% Выполнено", remaining: "% Осталось", bonusCalc: "Расчет бонуса:", targetBtn: "Сколько осталось до цели?", targetTitle: "Сколько осталось до цели?", backBtn: "Вернуться к основному плану", remDays: "Осталось дней:", totalPlan: "Месячный план:", currentTotal: "Текущий итог:", neededAmount: "Оставшаяся сумма:", dailyPlanning: "Дневное планирование", dailyTarget: "Дневная цель:", bonusTableTitle: "Дневной план", targetPercent: "Процент", requiredAmount: "Требуемая сумма", earnedEur: "Заработок (EUR)", dailyRequired: "Нужно в день", reached: "Достигнуто", planNotSet: "План не установлен.", daysFinished: "Дни прошли.", placeholder: "Введите план", calcTitle: "Тип расчета:", calcAllDays: "Все Дни", calcWorkDays: "Рабочие Дни", holidaysTitle: "Праздники:", remWorkDays: "Осталось Рабочих Дней:", settingsTitle: "Настройки", whTitle: "Калькулятор Часов", whInfo: "(09:00 - 18:00 / Чистая работа: 7.5 часов)", sickLeave: "Больничный (Дни)", vacation: "Отпуск (Дни)", holidayLeave: "Праздник (Дни)", totalDays: "Всего дней:", weekends: "Выходные (Сб/Вс):", workDays: "Чистые рабочие дни:", totalHours: "Итого часов:", timerTitle: "Таймер ошибок", reasonPlaceholder: "Причина остановки...", startTimerBtn: "Старт", stopTimerBtn: "Стоп", showArchive: "Показать архив", hideArchive: "Скрыть архив", dateCol: "Дата", durationCol: "Длительность", reasonCol: "Причина", emptyArchive: "Архив пуст"
     },
     tr: {
-        tabPlan: "Plan", tabWorkHours: "Mesai", tabCrm: "CRM Hata", plan: "Aylık Plan", doc: "CRM", crm: "DOC", total: "Toplam", result: "Sonuç", completed: "% Tamamlandı", remaining: "% Kaldı", bonusCalc: "Bonus Hesaplaması:", targetBtn: "Hedefe Ne Kadar Kaldı?", targetTitle: "Hedefe Ne Kadar Kaldı?", backBtn: "Ana Plana Geri Dön", remDays: "Kalan Gün Sayısı:", totalPlan: "Aylık Plan:", currentTotal: "Mevcut Toplam:", neededAmount: "Gereken Miktar:", dailyPlanning: "Günlük Planlama", dailyTarget: "Günlük Hedef:", bonusTableTitle: "Günlük Plan", targetPercent: "Yüzde", requiredAmount: "Gereken Miktar", earnedEur: "Kazanç (EUR)", dailyRequired: "Günlük Gereken", reached: "Ulaşıldı", planNotSet: "Plan ayarlanmadı.", daysFinished: "Günler bitti.", placeholder: "Planı girin", calcTitle: "Hesaplama Türü:", calcAllDays: "Tüm Günler", calcWorkDays: "İş Günleri", holidaysTitle: "Tatiller:", remWorkDays: "Kalan İş Günleri:", settingsTitle: "Ayarlar", 
-        whTitle: "Mesai Hesaplayıcı", whInfo: "(09:00 - 18:00 / Net günlük çalışma: 7.5 saat)", // YENİLƏNDİ
-        sickLeave: "Hastalık (Gün)", vacation: "İzin (Gün)", holidayLeave: "Tatil (Gün)", totalDays: "Aydaki Toplam Gün:", weekends: "Hafta Sonu (Ct/Pz):", workDays: "Net İş Günü:", totalHours: "Toplam Saat:", timerTitle: "Hata Zamanlayıcısı", reasonPlaceholder: "Durma nedeni...", startTimerBtn: "Başla", stopTimerBtn: "Durdur", showArchive: "Arşivi Göster", hideArchive: "Arşivi Gizle", dateCol: "Tarih", durationCol: "Süre", reasonCol: "Neden", emptyArchive: "Arşiv boş"
+        tabPlan: "Plan", tabWorkHours: "Mesai", tabCrm: "CRM Hata", plan: "Aylık Plan", doc: "CRM", crm: "DOC", total: "Toplam", result: "Sonuç", completed: "% Tamamlandı", remaining: "% Kaldı", bonusCalc: "Bonus Hesaplaması:", targetBtn: "Hedefe Ne Kadar Kaldı?", targetTitle: "Hedefe Ne Kadar Kaldı?", backBtn: "Ana Plana Geri Dön", remDays: "Kalan Gün Sayısı:", totalPlan: "Aylık Plan:", currentTotal: "Mevcut Toplam:", neededAmount: "Gereken Miktar:", dailyPlanning: "Günlük Planlama", dailyTarget: "Günlük Hedef:", bonusTableTitle: "Günlük Plan", targetPercent: "Yüzde", requiredAmount: "Gereken Miktar", earnedEur: "Kazanç (EUR)", dailyRequired: "Günlük Gereken", reached: "Ulaşıldı", planNotSet: "Plan ayarlanmadı.", daysFinished: "Günler bitti.", placeholder: "Planı girin", calcTitle: "Hesaplama Türü:", calcAllDays: "Tüm Günler", calcWorkDays: "İş Günleri", holidaysTitle: "Tatiller:", remWorkDays: "Kalan İş Günleri:", settingsTitle: "Ayarlar", whTitle: "Mesai Hesaplayıcı", whInfo: "(09:00 - 18:00 / Net günlük çalışma: 7.5 saat)", sickLeave: "Hastalık (Gün)", vacation: "İzin (Gün)", holidayLeave: "Tatil (Gün)", totalDays: "Toplam Gün:", weekends: "Hafta Sonu (Ct/Pz):", workDays: "Net İş Günü:", totalHours: "Toplam Saat:", timerTitle: "Hata Zamanlayıcısı", reasonPlaceholder: "Durma nedeni...", startTimerBtn: "Başla", stopTimerBtn: "Durdur", showArchive: "Arşivi Göster", hideArchive: "Arşivi Gizle", dateCol: "Tarih", durationCol: "Süre", reasonCol: "Neden", emptyArchive: "Arşiv boş"
     }
 };
-
-// ==============================
-// 1. ÜMUMİ İDARƏETMƏ (ROUTER)
-// ==============================
 
 function switchTab(tabId) {
     currentTab = tabId;
     isTargetView = false; 
-    
     document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`tab_${tabId}`).classList.add('active');
-    
     renderApp();
 }
 
 function renderApp() {
     const mainContent = document.getElementById('main-content');
     if (!mainContent) return;
-    
     if (currentTab === 'plan') {
         if (isTargetView) renderTargetPage(mainContent);
         else renderMainPlanPage(mainContent);
-    } 
-    else if (currentTab === 'workhours') {
+    } else if (currentTab === 'workhours') {
         renderWorkHoursPage(mainContent);
-    } 
-    else if (currentTab === 'crm') {
+    } else if (currentTab === 'crm') {
         renderCrmTimerPage(mainContent);
     }
 }
 
-// ==============================
-// 2. PLAN SƏHİFƏSİ
-// ==============================
 function renderMainPlanPage(container) {
     const texts = LANGUAGE_DATA[currentLang];
     container.innerHTML = `
         <div class="input-group">
-            <div class="header input-row">
-                <label for="plan">${texts.plan}</label>
-                <input type="number" id="plan" placeholder="${texts.placeholder}" value="${lastPlan || ''}">
-            </div>
-            <div class="input-row">
-                <label for="doc">${texts.doc}</label>
-                <input type="number" id="doc" min="0" value="${lastDoc || ''}"> 
-            </div>
-            <div class="input-row">
-                <label for="crm">${texts.crm}</label>
-                <input type="number" id="crm" min="0" value="${lastCrm || ''}">
-            </div>
+            <div class="header input-row"><label for="plan">${texts.plan}</label><input type="number" id="plan" placeholder="${texts.placeholder}" value="${lastPlan || ''}"></div>
+            <div class="input-row"><label for="doc">${texts.doc}</label><input type="number" id="doc" min="0" value="${lastDoc || ''}"></div>
+            <div class="input-row"><label for="crm">${texts.crm}</label><input type="number" id="crm" min="0" value="${lastCrm || ''}"></div>
         </div>
-        <div class="total input-row">
-            <label>${texts.total}</label>
-            <span id="total_value">0</span>
-        </div>
+        <div class="total input-row"><label>${texts.total}</label><span id="total_value">0</span></div>
         <div class="percentage">
             <label id="result_label">${texts.result}:</label>
             <div class="input-row"><label></label><div id="percentage_reached">0${texts.completed}</div></div>
@@ -158,7 +87,6 @@ function renderMainPlanPage(container) {
     document.getElementById('doc').addEventListener('input', savePlanValues);
     document.getElementById('crm').addEventListener('input', savePlanValues);
     document.getElementById('target_button').addEventListener('click', () => { isTargetView = true; renderApp(); });
-
     updatePlanResults(lastPlan, lastDoc, lastCrm);
 }
 
@@ -198,9 +126,6 @@ function updatePlanResults(plan, doc, crm) {
     document.getElementById('final_result_value_azn').textContent = `${(finalEur * EXCHANGE_RATE).toFixed(2)} AZN`;
 }
 
-// ==============================
-// 2.1 HƏDƏF SƏHİFƏSİ (TARGET)
-// ==============================
 function renderTargetPage(container) {
     const texts = LANGUAGE_DATA[currentLang];
     const currentTotal = lastDoc + lastCrm;
@@ -223,7 +148,7 @@ function renderTargetPage(container) {
         <div class="target-info" style="margin-bottom:15px;">
             <div class="input-row"><strong>${texts.remDays}</strong> <span>${remainingDays}</span></div>
             <div class="input-row"><strong>${texts.currentTotal}</strong> <span>${currentTotal.toFixed(0)}</span></div>
-            <div class="input-row"><strong>${texts.dailyTarget}</strong> <span style="color:#00ff00;">${dailyTarget.toFixed(2)}</span></div>
+            <div class="input-row"><strong>${texts.dailyTarget}</strong> <span style="color:#00eaff;">${dailyTarget.toFixed(2)}</span></div>
         </div>
         <table id="daily_bonus_targets" style="width:100%; text-align:center; border-collapse: collapse;">
             <thead><tr><th>%</th><th>AMT</th><th>EUR</th><th>Daily</th></tr></thead>
@@ -240,9 +165,6 @@ function calculateRemainingDays() {
     return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate() + 1;
 }
 
-// ==============================
-// 3. İŞ SAATİ SƏHİFƏSİ
-// ==============================
 function renderWorkHoursPage(container) {
     const texts = LANGUAGE_DATA[currentLang];
     
@@ -251,27 +173,18 @@ function renderWorkHoursPage(container) {
         <p style="text-align:center; font-size: 0.85em; opacity: 0.7; margin-top:-10px;">${texts.whInfo}</p>
         
         <div class="input-group" style="margin-top: 15px;">
-            <div class="input-row">
-                <label>${texts.sickLeave}</label>
-                <input type="number" id="wh_sick" min="0" value="${sickDays}">
-            </div>
-            <div class="input-row">
-                <label>${texts.vacation}</label>
-                <input type="number" id="wh_vac" min="0" value="${vacDays}">
-            </div>
-            <div class="input-row">
-                <label>${texts.holidayLeave}</label>
-                <input type="number" id="wh_hol" min="0" value="${holDays}">
-            </div>
+            <div class="input-row"><label>${texts.sickLeave}</label><input type="number" id="wh_sick" min="0" value="${sickDays}"></div>
+            <div class="input-row"><label>${texts.vacation}</label><input type="number" id="wh_vac" min="0" value="${vacDays}"></div>
+            <div class="input-row"><label>${texts.holidayLeave}</label><input type="number" id="wh_hol" min="0" value="${holDays}"></div>
         </div>
 
         <div class="info target-info" style="margin-top: 15px;">
             <div class="input-row"><strong>${texts.totalDays}</strong> <span id="res_totalDays">0</span></div>
             <div class="input-row"><strong>${texts.weekends}</strong> <span id="res_weekends">0</span></div>
-            <div class="input-row" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px;">
-                <strong>${texts.workDays}</strong> <span id="res_workDays" style="color:#00eaff;">0</span>
+            <div class="input-row" style="border-top: 1px solid rgba(128,128,128,0.2); padding-top: 5px;">
+                <strong>${texts.workDays}</strong> <span id="res_workDays" style="color:var(--primary-color); font-weight:bold;">0</span>
             </div>
-            <div class="input-row" style="font-size: 1.2em; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px;">
+            <div class="input-row" style="font-size: 1.2em; border-top: 1px solid rgba(128,128,128,0.2); padding-top: 5px;">
                 <strong>${texts.totalHours}</strong> <span id="res_totalHours" style="color:#50fa7b; font-weight:bold;">0</span>
             </div>
         </div>
@@ -280,7 +193,6 @@ function renderWorkHoursPage(container) {
     ['wh_sick', 'wh_vac', 'wh_hol'].forEach(id => {
         document.getElementById(id).addEventListener('input', calculateWorkHours);
     });
-
     calculateWorkHours();
 }
 
@@ -307,8 +219,6 @@ function calculateWorkHours() {
     const maxWorkDays = totalDaysInMonth - weekends;
     const deductedDays = sickDays + vacDays + holDays;
     const actualWorkDays = Math.max(0, maxWorkDays - deductedDays);
-    
-    // Gündəlik xalis iş saatı 7.5 olaraq YENİLƏNDİ
     const totalWorkHours = actualWorkDays * 7.5; 
 
     document.getElementById('res_totalDays').textContent = totalDaysInMonth;
@@ -317,9 +227,6 @@ function calculateWorkHours() {
     document.getElementById('res_totalHours').textContent = totalWorkHours.toFixed(1);
 }
 
-// ==============================
-// 4. CRM XƏTA (TAYMER) SƏHİFƏSİ
-// ==============================
 function renderCrmTimerPage(container) {
     const texts = LANGUAGE_DATA[currentLang];
     
@@ -329,11 +236,11 @@ function renderCrmTimerPage(container) {
             <div class="timer-display" id="timer_display" style="font-size:3em; margin-bottom:20px;">
                 ${formatTime(timerSeconds)}
             </div>
-            <input type="text" id="pause_reason" placeholder="${texts.reasonPlaceholder}" style="width:100%; padding: 10px; margin-bottom:15px; border-radius: 4px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color:white; box-sizing: border-box;">
+            <input type="text" id="pause_reason" placeholder="${texts.reasonPlaceholder}" style="width:100%; padding: 10px; margin-bottom:15px; border-radius: 4px; border: 1px solid var(--border-color); background: rgba(128,128,128,0.1); color:var(--text-color); box-sizing: border-box;">
             
             <div style="display: flex; gap: 10px;">
-                <button id="start_timer_btn" style="flex:1; background: #28a745; color: white; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;">${texts.startTimerBtn}</button>
-                <button id="stop_timer_btn" style="flex:1; background: #dc3545; color: white; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;" ${timerInterval ? '' : 'disabled'}>${texts.stopTimerBtn}</button>
+                <button id="start_timer_btn" style="flex:1; background: #28a745; color: white; padding: 12px; font-weight: bold; border-radius: 4px; border:none; cursor: pointer;">${texts.startTimerBtn}</button>
+                <button id="stop_timer_btn" style="flex:1; background: #dc3545; color: white; padding: 12px; font-weight: bold; border-radius: 4px; border:none; cursor: pointer;" ${timerInterval ? '' : 'disabled'}>${texts.stopTimerBtn}</button>
             </div>
         </div>
 
@@ -354,7 +261,6 @@ function renderCrmTimerPage(container) {
     document.getElementById('toggle_archive_btn').addEventListener('click', toggleArchive);
     
     if(timerInterval) document.getElementById('start_timer_btn').disabled = true;
-
     if (isArchiveVisible) renderArchiveList();
 }
 
@@ -367,13 +273,11 @@ function formatTime(totalSeconds) {
 
 function startTimer() {
     if (timerInterval) return;
-    
     const startBtn = document.getElementById('start_timer_btn');
     if(startBtn) {
         startBtn.disabled = true;
         document.getElementById('stop_timer_btn').disabled = false;
     }
-    
     timerInterval = setInterval(() => {
         timerSeconds++;
         const display = document.getElementById('timer_display');
@@ -419,14 +323,22 @@ function renderArchiveList() {
         return;
     }
     [...archiveData].reverse().forEach(item => {
-        tbody.innerHTML += `<tr><td style="font-size:0.8em;opacity:0.8;">${item.date}</td><td style="font-weight:bold;color:#ff6b6b;">${item.duration}</td><td>${item.reason}</td></tr>`;
+        tbody.innerHTML += `<tr><td style="font-size:0.8em;opacity:0.8;">${item.date}</td><td style="font-weight:bold;color:var(--danger-color);">${item.duration}</td><td>${item.reason}</td></tr>`;
     });
 }
 
-// ==============================
-// 5. İLK YÜKLƏMƏ VƏ DİL
-// ==============================
 document.addEventListener('DOMContentLoaded', () => {
+    // Tema (Gece/Gunduz)
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') document.body.classList.add('light-mode');
+
+    document.getElementById('theme_toggle').addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        const newTheme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
+        localStorage.setItem('theme', newTheme);
+    });
+
+    // Diger datalar
     currentLang = localStorage.getItem('language') || 'az';
     lastPlan = parseFloat(localStorage.getItem('plan')) || 0;
     lastDoc = parseFloat(localStorage.getItem('doc')) || 0;
@@ -443,14 +355,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('.lang-button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            currentLang = e.target.getAttribute('data-lang');
-            localStorage.setItem('language', currentLang);
-            document.querySelectorAll('.lang-button').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            updateTabTexts();
-            renderApp();
-        });
+        if(btn.id !== 'theme_toggle') {
+            btn.addEventListener('click', (e) => {
+                currentLang = e.target.getAttribute('data-lang');
+                localStorage.setItem('language', currentLang);
+                document.querySelectorAll('.lang-button:not(#theme_toggle)').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                updateTabTexts();
+                renderApp();
+            });
+        }
     });
 
     document.getElementById(`lang-${currentLang}`).classList.add('active');
