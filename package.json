@@ -1,6 +1,6 @@
 {
   "name": "ayliq-plan",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Aylıq Plan Hesablayıcı",
   "main": "main.js",
   "repository": {
@@ -22,21 +22,18 @@
     "electron-builder": "^24.9.1"
   },
   "build": {
-    "appId": "com.hemideziz.ayliqplan",
-    "productName": "Aylıq Plan",
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "runAfterFinish": true
+    },
     "publish": [
       {
         "provider": "github",
         "owner": "elhemide-creator",
         "repo": "ayliq-plan-app"
       }
-    ],
-    "win": {
-      "target": "nsis"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    }
+    ]
   }
 }

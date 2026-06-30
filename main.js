@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
@@ -7,8 +7,8 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 450,
     height: 750,
-    minWidth: 420,
-    minHeight: 600,
+    minWidth: 350,
+    minHeight: 300,
     autoHideMenuBar: true, 
     webPreferences: {
       nodeIntegration: true,
@@ -19,7 +19,6 @@ function createWindow () {
   mainWindow.loadFile('popup.html');
 
   mainWindow.once('ready-to-show', () => {
-    // Proqram açılanda yenilənməni yoxlamağa başlayır
     autoUpdater.checkForUpdatesAndNotify();
   });
 }
@@ -35,19 +34,27 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// --- YENİLƏNMƏ ÜÇÜN TEST (DEBUG) KODLARI ---
-
-autoUpdater.on('checking-for-update', () => {
-  // dialog.showMessageBox({ type: 'info', title: 'Test', message: 'Yenilənmə yoxlanılır...' }); 
-  // (Bunu aktiv etmirik ki, hər dəfə proqram açılanda bezdirməsin)
+// --- AYARLAR ÜÇÜN IPC KODLARI ---
+ipcMain.on('toggle-startup', (event, enable) => {
+  app.setLoginItemSettings({
+    openAtLogin: enable,
+    path: app.getPath('exe')
+  });
 });
 
-autoUpdater.on('update-available', (info) => {
-  dialog.showMessageBox({ type: 'info', title: 'Tapıldı!', message: 'Yeni versiya tapıldı! Arxa planda yüklənir, zəhmət olmasa gözləyin...' });
+ipcMain.on('toggle-mini-mode', (event, enable) => {
+  if (enable) {
+    mainWindow.setAlwaysOnTop(true, 'screen-saver');
+    mainWindow.setSize(350, 350);
+  } else {
+    mainWindow.setAlwaysOnTop(false);
+    mainWindow.setSize(450, 750);
+  }
 });
 
-autoUpdater.on('update-not-available', (info) => {
-  // dialog.showMessageBox({ type: 'info', title: 'Ən son versiya', message: 'Hazırda ən son versiyanı istifadə edirsiniz.' });
+// --- YENİLƏNMƏ KODLARI (SƏSSİZ) ---
+autoUpdater.on('update-available', () => {
+  dialog.showMessageBox({ type: 'info', title: 'Tapıldı!', message: 'Yeni versiya tapıldı! Arxa planda yüklənir...' });
 });
 
 autoUpdater.on('error', (err) => {
@@ -65,7 +72,8 @@ autoUpdater.on('update-downloaded', () => {
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) {
-      autoUpdater.quitAndInstall();
+      // true, true edərək "Next, Next" pəncərələrini ləğv edib səssiz quraşdırırıq
+      autoUpdater.quitAndInstall(true, true);
     }
   });
 });
