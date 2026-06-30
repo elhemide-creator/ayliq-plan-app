@@ -77,7 +77,12 @@ input:focus { box-shadow: var(--neon-shadow); border-color: var(--primary-color)
 .setting-item { margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
 input[type="color"] { width: 100%; height: 40px; border: none; border-radius: 4px; cursor: pointer; background: transparent; }
 
-/* --- MİNİ REJİM ÜÇÜN --- */
+/* --- MİNİ REJİM (WIDGET) ÜÇÜN STİLLƏR --- */
+body.mini-mode {
+    padding: 15px 15px 15px 55px !important; /* Sol tərəfdə qara ox üçün yer açırıq */
+    overflow: hidden;
+}
+
 body.mini-mode .top-bar, 
 body.mini-mode .header-logo, 
 body.mini-mode .lang-switcher, 
@@ -86,7 +91,27 @@ body.mini-mode .header,
 body.mini-mode #target_button { 
     display: none !important; 
 }
-body.mini-mode {
-    padding: 0;
-}
+
 body.mini-mode .total, body.mini-mode .percentage, body.mini-mode .final-result { margin-bottom: 5px; }
+
+#widget_handle {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 40px;
+    background-color: #0b0b0b;
+    color: var(--primary-color);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    z-index: 1000;
+    border-right: 2px solid var(--border-color);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.8);
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#widget_handle:hover { background-color: #1a1a1a; }
+
+body.mini-mode #widget_handle { display: flex !important; }
+body.mini-mode #exit_mini_btn { display: block !important; }

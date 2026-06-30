@@ -12,6 +12,8 @@
 </head>
 <body>
     
+    <div id="widget_handle" class="hidden">◀</div>
+
     <div class="top-bar">
         <button id="settings_btn" class="icon-btn">⚙️ Ayarlar</button>
         <button class="lang-button" id="theme_toggle">☀️/🌙</button>
@@ -34,30 +36,27 @@
     
     <div id="main-content"></div>
 
+    <button id="exit_mini_btn" class="primary-btn hidden" style="margin-top: 15px; background: #6c757d; border-color: #6c757d; color: white;">⛶ Normal Rejimə Qayıt</button>
+
     <div id="settings_modal" class="modal hidden">
         <div class="modal-content">
             <h3 style="text-align: center; margin-top:0;">Ayarlar</h3>
-            
             <div class="setting-item">
                 <label>Fərdiləşdirilmiş Neon Rəngi:</label>
                 <input type="color" id="neon_color_picker" value="#00eaff">
             </div>
-            
             <div class="setting-item">
                 <label style="display:flex; align-items:center; cursor:pointer;">
                     <input type="checkbox" id="startup_toggle" style="margin-right:10px; width:18px; height:18px;"> 
                     Kompüter açılanda avtomatik başlasın
                 </label>
             </div>
-
             <div class="setting-item" style="border-top:1px solid var(--border-color); padding-top:10px;">
                 <label style="display:flex; align-items:center; cursor:pointer; color: var(--danger-color); font-weight:bold;">
                     <input type="checkbox" id="mini_mode_toggle" style="margin-right:10px; width:18px; height:18px;"> 
-                    Mini-Rejim (Həmişə Üstdə Sabitlə)
+                    Mini-Rejim (Ekranın sağında Widget kimi)
                 </label>
-                <p style="font-size:0.8em; opacity:0.7; margin-top:5px; font-weight:normal;">Qeyd: Bu rejim ancaq ən vacib göstəriciləri ekranda saxlayır.</p>
             </div>
-
             <button id="close_settings" class="primary-btn">Yadda Saxla & Bağla</button>
         </div>
     </div>

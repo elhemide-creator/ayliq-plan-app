@@ -7,6 +7,7 @@ const BONUS_PERCENTAGES = { 70: 35, 80: 50, 90: 70, 100: 110, 105: 115, 110: 120
 let currentTab = 'plan'; 
 let lastPlan = 0, lastDoc = 0, lastCrm = 0;
 let timerInterval = null, timerSeconds = 0;
+let isWidgetExpanded = false; 
 
 function switchTab(tabId) {
     currentTab = tabId;
@@ -71,7 +72,6 @@ function updatePlanResults(plan, doc, crm) {
     const total = doc + crm;
     let reachedPercentage = (plan > 0) ? (total / plan) * 100 : 0;
     const bonusAmount = (BASE_AMOUNT_EUR * getBonusPercentage(reachedPercentage)) / 100;
-    const finalEur = bonusAmount + BASE_AMOUNT_EUR;
     
     const eTotal = document.getElementById('total_value');
     if(eTotal) {
@@ -79,73 +79,24 @@ function updatePlanResults(plan, doc, crm) {
         document.getElementById('percentage_reached').textContent = `${reachedPercentage.toFixed(1)}%`;
         document.getElementById('percentage_reached').style.color = reachedPercentage >= 100 ? '#50fa7b' : '#ff6b6b';
         document.getElementById('percentage_left').textContent = `${Math.max(0, 100 - reachedPercentage).toFixed(1)}%`;
-        document.getElementById('final_result_value_eur').textContent = `${finalEur.toFixed(2)} EUR`;
+        document.getElementById('final_result_value_eur').textContent = `${(bonusAmount + BASE_AMOUNT_EUR).toFixed(2)} EUR`;
     }
 }
 
-function renderWorkHoursPage(container) {
-    container.innerHTML = `<h3 style="text-align:center;">İş Saatı Hesablayıcı</h3><p style="text-align:center;opacity:0.7;">(Tezliklə inkişaf etdiriləcək)</p>`;
-}
+function renderWorkHoursPage(container) { container.innerHTML = `<h3 style="text-align:center;">İş Saatı</h3><p style="text-align:center;opacity:0.7;">(Tezliklə)</p>`; }
+function renderCrmTimerPage(container) { container.innerHTML = `<h3 style="text-align: center;">Xəta Taymeri</h3><p style="text-align:center;opacity:0.7;">(Tezliklə)</p>`; }
 
-function renderCrmTimerPage(container) {
-    container.innerHTML = `
-        <h3 style="text-align: center;">Xəta Taymeri</h3>
-        <div class="timer-display" id="timer_display">${formatTime(timerSeconds)}</div>
-        <div style="display: flex; gap: 10px; margin-top:20px;">
-            <button id="start_timer_btn" class="primary-btn" style="background:#28a745;">Başla</button>
-            <button id="stop_timer_btn" class="primary-btn" style="background:#dc3545;" ${timerInterval ? '' : 'disabled'}>Dayandır</button>
-        </div>
-    `;
-    document.getElementById('start_timer_btn').addEventListener('click', startTimer);
-    document.getElementById('stop_timer_btn').addEventListener('click', stopTimer);
-}
-
-function formatTime(totalSeconds) {
-    const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-    const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-    const s = String(totalSeconds % 60).padStart(2, '0');
-    return `${h}:${m}:${s}`;
-}
-
-function startTimer() {
-    if (timerInterval) return;
-    document.getElementById('start_timer_btn').disabled = true;
-    document.getElementById('stop_timer_btn').disabled = false;
-    timerInterval = setInterval(() => {
-        timerSeconds++;
-        const display = document.getElementById('timer_display');
-        if(display) display.textContent = formatTime(timerSeconds); 
-    }, 1000);
-}
-
-function stopTimer() {
-    clearInterval(timerInterval);
-    timerInterval = null;
-    timerSeconds = 0;
-    if (document.getElementById('timer_display')) {
-        document.getElementById('timer_display').textContent = "00:00:00";
-        document.getElementById('start_timer_btn').disabled = false;
-        document.getElementById('stop_timer_btn').disabled = true;
-    }
-}
-
-// --- DİZAYN VƏ AYARLAR MƏNTİQİ ---
 function applyThemeColor(color) {
     document.documentElement.style.setProperty('--primary-color', color);
-    document.documentElement.style.setProperty('--border-color', color + '80'); // 50% opacity
+    document.documentElement.style.setProperty('--border-color', color + '80'); 
     document.documentElement.style.setProperty('--neon-shadow', `0 0 8px ${color}`);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Rəng Yükləməsi
-    const savedColor = localStorage.getItem('neonColor') || '#00eaff';
-    applyThemeColor(savedColor);
-    document.getElementById('neon_color_picker').value = savedColor;
-
-    // Gecə/Gündüz Yükləməsi
+    applyThemeColor(localStorage.getItem('neonColor') || '#00eaff');
+    document.getElementById('neon_color_picker').value = localStorage.getItem('neonColor') || '#00eaff';
     if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
 
-    // Startup və Mini-Mode Yükləməsi
     const isStartup = localStorage.getItem('autoStartup') === 'true';
     const isMiniMode = localStorage.getItem('miniMode') === 'true';
     document.getElementById('startup_toggle').checked = isStartup;
@@ -153,52 +104,73 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if(isMiniMode) {
         document.body.classList.add('mini-mode');
+        isWidgetExpanded = false;
+        document.getElementById('widget_handle').innerHTML = '◀';
         ipcRenderer.send('toggle-mini-mode', true);
     }
 
-    // Dataları yüklə
     lastPlan = parseFloat(localStorage.getItem('plan')) || 0;
     lastDoc = parseFloat(localStorage.getItem('doc')) || 0;
     lastCrm = parseFloat(localStorage.getItem('crm')) || 0;
     
-    // Tab eventləri
     document.querySelectorAll('.tab-link').forEach(btn => {
         btn.addEventListener('click', (e) => switchTab(e.target.getAttribute('data-target')));
     });
 
-    // Tema düyməsi
     document.getElementById('theme_toggle').addEventListener('click', () => {
         document.body.classList.toggle('light-mode');
         localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
     });
 
-    // Ayarlar Modalı Eventləri
     const modal = document.getElementById('settings_modal');
     document.getElementById('settings_btn').addEventListener('click', () => modal.classList.remove('hidden'));
     
     document.getElementById('close_settings').addEventListener('click', () => {
-        // Rəngi yaddaşa vur
         const newColor = document.getElementById('neon_color_picker').value;
         localStorage.setItem('neonColor', newColor);
         applyThemeColor(newColor);
 
-        // Startup yaddaşa vur və main.js-ə göndər
         const startup = document.getElementById('startup_toggle').checked;
         localStorage.setItem('autoStartup', startup);
         ipcRenderer.send('toggle-startup', startup);
 
-        // Mini Mode yaddaşa vur və main.js-ə göndər
         const miniMode = document.getElementById('mini_mode_toggle').checked;
         localStorage.setItem('miniMode', miniMode);
         if (miniMode) {
             document.body.classList.add('mini-mode');
+            isWidgetExpanded = false;
+            document.getElementById('widget_handle').innerHTML = '◀';
             ipcRenderer.send('toggle-mini-mode', true);
         } else {
             document.body.classList.remove('mini-mode');
             ipcRenderer.send('toggle-mini-mode', false);
         }
-
         modal.classList.add('hidden');
+    });
+
+    // --- WIDGET HOVER MƏNTİQİ ---
+    window.addEventListener('mouseenter', () => {
+        if (document.body.classList.contains('mini-mode') && !isWidgetExpanded) {
+            isWidgetExpanded = true;
+            document.getElementById('widget_handle').innerHTML = '▶';
+            ipcRenderer.send('widget-state', 'expand');
+        }
+    });
+
+    window.addEventListener('mouseleave', () => {
+        if (document.body.classList.contains('mini-mode') && isWidgetExpanded) {
+            isWidgetExpanded = false;
+            document.getElementById('widget_handle').innerHTML = '◀';
+            ipcRenderer.send('widget-state', 'collapse');
+        }
+    });
+
+    // --- NORMAL REJİMƏ QAYIDIŞ ---
+    document.getElementById('exit_mini_btn').addEventListener('click', () => {
+        document.body.classList.remove('mini-mode');
+        localStorage.setItem('miniMode', 'false');
+        document.getElementById('mini_mode_toggle').checked = false;
+        ipcRenderer.send('toggle-mini-mode', false);
     });
 
     renderApp();

@@ -1,6 +1,6 @@
 {
   "name": "ayliq-plan",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Aylıq Plan Hesablayıcı",
   "main": "main.js",
   "repository": {

@@ -1,14 +1,15 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, screen } = require('electron');
 const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
+let normalBounds = {};
 
 function createWindow () {
   mainWindow = new BrowserWindow({
     width: 450,
     height: 750,
-    minWidth: 350,
-    minHeight: 300,
+    minWidth: 300,
+    minHeight: 350,
     autoHideMenuBar: true, 
     webPreferences: {
       nodeIntegration: true,
@@ -34,46 +35,44 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// --- AYARLAR ÜÇÜN IPC KODLARI ---
+// --- AYARLAR VƏ WIDGET (MİNİ-REJİM) KODLARI ---
 ipcMain.on('toggle-startup', (event, enable) => {
-  app.setLoginItemSettings({
-    openAtLogin: enable,
-    path: app.getPath('exe')
-  });
+  app.setLoginItemSettings({ openAtLogin: enable, path: app.getPath('exe') });
 });
 
 ipcMain.on('toggle-mini-mode', (event, enable) => {
+  const display = screen.getPrimaryDisplay();
+  const { width, height } = display.workAreaSize;
+
   if (enable) {
+    normalBounds = mainWindow.getBounds(); // Normal ölçünü yadda saxla
     mainWindow.setAlwaysOnTop(true, 'screen-saver');
-    mainWindow.setSize(350, 350);
+    // Ekranın sağ kənarına qısılmış (gizli) vəziyyətdə göndəririk
+    mainWindow.setBounds({ x: width - 40, y: Math.floor(height / 2 - 200), width: 300, height: 400 });
   } else {
     mainWindow.setAlwaysOnTop(false);
-    mainWindow.setSize(450, 750);
+    mainWindow.setBounds(normalBounds); // Əvvəlki yerinə qaytar
   }
 });
 
-// --- YENİLƏNMƏ KODLARI (SƏSSİZ) ---
-autoUpdater.on('update-available', () => {
-  dialog.showMessageBox({ type: 'info', title: 'Tapıldı!', message: 'Yeni versiya tapıldı! Arxa planda yüklənir...' });
+// Mouse üzərinə gələndə və gedəndə ölçünü dəyişmək üçün
+ipcMain.on('widget-state', (event, state) => {
+  const display = screen.getPrimaryDisplay();
+  const { width } = display.workAreaSize;
+  const bounds = mainWindow.getBounds();
+
+  if (state === 'expand') { // Açılır
+    mainWindow.setBounds({ x: width - 300, y: bounds.y, width: 300, height: bounds.height });
+  } else if (state === 'collapse') { // Gizlənir
+    mainWindow.setBounds({ x: width - 40, y: bounds.y, width: 300, height: bounds.height });
+  }
 });
 
-autoUpdater.on('error', (err) => {
-  dialog.showErrorBox('Yenilənmə Xətası!', err == null ? "Bilinməyən xəta" : (err.stack || err).toString());
-});
-
+// --- YENİLƏNMƏ KODLARI ---
+autoUpdater.on('update-available', () => { dialog.showMessageBox({ type: 'info', title: 'Tapıldı!', message: 'Yeni versiya tapıldı! Arxa planda yüklənir...' }); });
+autoUpdater.on('error', (err) => { dialog.showErrorBox('Yenilənmə Xətası!', err == null ? "Bilinməyən xəta" : (err.stack || err).toString()); });
 autoUpdater.on('update-downloaded', () => {
-  const dialogOpts = {
-    type: 'info',
-    buttons: ['İndi Yenidən Başlat', 'Sonra'],
-    title: 'Tətbiq Yenilənməsi',
-    message: 'Yeni versiya tam yükləndi!',
-    detail: 'Dəyişikliklərin tətbiq edilməsi üçün proqram yenidən başladılmalıdır.'
-  };
-
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) {
-      // true, true edərək "Next, Next" pəncərələrini ləğv edib səssiz quraşdırırıq
-      autoUpdater.quitAndInstall(true, true);
-    }
+  dialog.showMessageBox({ type: 'info', buttons: ['İndi Yenidən Başlat', 'Sonra'], title: 'Yenilənmə', message: 'Yükləndi!' }).then((res) => {
+    if (res.response === 0) autoUpdater.quitAndInstall(true, true);
   });
 });
